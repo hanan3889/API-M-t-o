@@ -1,41 +1,91 @@
-let ville = "Paris";
+let ville;
 recevoirTemperature(ville);
 
+if ("geolocation" in navigator) {
+    navigator.geolocation.watchPosition(
+        (position) => {
+            const url =
+                "https://api.openweathermap.org/data/2.5/weather?lon=" +
+                position.coords.longitude +
+                "&lat=" +
+                position.coords.latitude +
+                "&appid=dc8c9152e8adaad0ec8bf635818c0d42&units=metric";
+            console.log(url);
 
+            let requete = new XMLHttpRequest(); // Nous créons un objet qui nous permettra de faire des requêtes
+            requete.open("GET", url); // Nous récupérons juste des données
+            requete.responseType = "json"; // Nous attendons du JSON
+            requete.send(); // Nous envoyons notre requête
 
-let changerDeVille = document.querySelector('#changer');
+            // Dès qu'on reçoit une réponse, cette fonction est executée
+            requete.onload = function () {
+                if (requete.readyState === XMLHttpRequest.DONE) {
+                    if (requete.status === 200) {
+                        let reponse = requete.response;
+                        // console.log(reponse);
+                        let temperature = reponse.main.temp;
+                        let ville = reponse.name;
+                        // console.log(temperature);
+                        document.querySelector(
+                            "#temperature_label"
+                        ).textContent = temperature;
+                        document.querySelector("#ville").textContent = ville;
+                    } else {
+                        alert(
+                            "Un problème est intervenu, merci de revenir plus tard."
+                        );
+                    }
+                }
+            };
+        },
+        error,
+        options
+    );
+} else {
+    villeChoisie = "Paris";
+    recevoirTemperatur(villeChoisie);
+}
 
-changerDeVille.addEventListener('click', () =>{
-    ville = prompt('Which city would you like to see ? ');
-    recevoirTemperature(ville);
-})
+var options = {
+    enableHighAccuracy: true,
+};
 
+let changerDeVille = document.querySelector("#changer");
+changerDeVille.addEventListener("click", () => {
+    villeChoisie = prompt("Quelle ville souhaitez-vous voir ?");
+    recevoirTemperature(villeChoisie);
+});
 
-function recevoirTemperature(ville){
-    const url = 'https://api.openweathermap.org/data/2.5/weather?q=' 
-    + ville + '&appid=558943e66503455f250afa6808ed2879&units=metric';
+function error() {
+    villeChoisie = "Paris";
+    recevoirTemperature(villeChoisie);
+}
+function recevoirTemperature(ville) {
+    const url =
+        "https://api.openweathermap.org/data/2.5/weather?q=" +
+        ville +
+        "&appid=dc8c9152e8adaad0ec8bf635818c0d42&units=metric";
 
-    //créer un objet
-    let requete = new XMLHttpRequest();
-    requete.open('GET', url);
-    requete.responseType = 'json';
-    requete.send();
+    let requete = new XMLHttpRequest(); // Nous créons un objet qui nous permettra de faire des requêtes
+    requete.open("GET", url); // Nous récupérons juste des données
+    requete.responseType = "json"; // Nous attendons du JSON
+    requete.send(); // Nous envoyons notre requête
 
-    requete.onload = function() {
+    // Dès qu'on reçoit une réponse, cette fonction est executée
+    requete.onload = function () {
         if (requete.readyState === XMLHttpRequest.DONE) {
             if (requete.status === 200) {
                 let reponse = requete.response;
+                // console.log(reponse);
                 let temperature = reponse.main.temp;
-                let ville       = reponse.name;
-                console.log(ville);    
-                document.querySelector('#temperature_label').textContent = temperature;
-                document.querySelector('#ville').textContent = ville;
+                let ville = reponse.name;
+                // console.log(temperature);
+                document.querySelector("#temperature_label").textContent =
+                    temperature;
+                document.querySelector("#ville").textContent = ville;
+            } else {
+                alert("Un problème est intervenu, merci de revenir plus tard.");
             }
         }
-        else {
-            alert('A problem has occurred, please come back later.')
-        }
-    }
+    };
 }
-
-
